@@ -54,12 +54,6 @@ YadifMod::YadifMod(PClip c, PClip e, int o, int f, int m, arch_t arch) :
 }
 
 
-static inline int mapn(int n, const int& nf)
-{
-    return std::min(std::max(n, 0), nf - 1);
-}
-
-
 PVideoFrame __stdcall YadifMod::GetFrame(int n, ise_t* env)
 {
     const int planes[3] = { PLANAR_Y, PLANAR_U, PLANAR_V };

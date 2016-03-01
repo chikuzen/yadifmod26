@@ -109,4 +109,4 @@ CHANGE LIST:
 
 SOURCE CODE:
 
-    https://github.com/chikuzen/
+    https://github.com/chikuzen/yadifmod26/
