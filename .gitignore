@@ -1,0 +1,14 @@
+*.dll
+*.avs
+*.avsi
+*.opensdf
+*.sdf
+*.sln
+*.suo
+*.vcxproj.filters
+*.user
+*.zip
+src/Release/*
+src/Debug/*
+src/x64/*
+yadifmod/*
