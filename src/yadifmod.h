@@ -45,15 +45,13 @@ typedef enum {
 
 
 typedef void(__stdcall *proc_filter_t)(
-    const uint8_t* curr_pre, const uint8_t* curr_nxt, const uint8_t* prev_pre,
-    const uint8_t* prev_nxt, const uint8_t* next_pre, const uint8_t* next_nxt,
-    const uint8_t* fm_prev_top, const uint8_t* fm_prev_mdl,
-    const uint8_t* fm_prev_btm, const uint8_t* fm_next_top,
-    const uint8_t* fm_next_mdl, const uint8_t* fm_next_btm,
-    const uint8_t* edeintp, uint8_t* dstp, const int width, const int height,
-    const int cpitch2, const int ppitch2, const int npitch2,
-    const int fm_ppitch, const int fm_npitch, const int epitch2,
-    const int dpitch2, const int begin, const int end);
+    const uint8_t* currp, const uint8_t* prevp, const uint8_t* nextp,
+    const uint8_t* fm_prev, const uint8_t* fm_next, const uint8_t* edeintp,
+    uint8_t* dstp, const int width, const int cpitch, const int ppitch,
+    const int npitch, const int fm_ppitch, const int fm_npitch,
+    const int epitch2, const int dpitch2, const int count);
+
+proc_filter_t get_main_proc(bool sp_check, arch_t arcg);
 
 class YadifMod : public GenericVideoFilter {
     PClip edeint;
@@ -63,7 +61,7 @@ class YadifMod : public GenericVideoFilter {
     int mode;
     int numPlanes;
 
-    proc_filter_t main_proc;
+    proc_filter_t mainProc;
 
 public:
     YadifMod(PClip child, PClip edeint, int order, int field, int mode,

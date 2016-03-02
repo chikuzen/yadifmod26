@@ -50,7 +50,7 @@ YadifMod::YadifMod(PClip c, PClip e, int o, int f, int m, arch_t arch) :
         field = order;
     }
 
-    main_proc = get_main_proc(mode < 2, arch);
+    mainProc = get_main_proc(mode < 2, arch);
 }
 
 
@@ -61,9 +61,9 @@ PVideoFrame __stdcall YadifMod::GetFrame(int n, ise_t* env)
 
     auto edeint = this->edeint->GetFrame(n, env);
 
-    int fieldt = field;
+    int ft = field;
     if (mode == 1 || mode == 3) {
-        fieldt = (n & 1) ? 1 - order : order;
+        ft = (n & 1) ? 1 - order : order;
         n /= 2;
     }
 
@@ -86,34 +86,22 @@ PVideoFrame __stdcall YadifMod::GetFrame(int n, ise_t* env)
         const int ppitch = prev->GetPitch(plane);
         const int npitch = next->GetPitch(plane);
 
-        const int begin = 2 + fieldt;
-        const int end = height - 4 + fieldt;
+        const int begin = 2 + ft;
+        const int count = (height - 4 + ft - begin) / 2 + 1;
 
-        const uint8_t* curr_pre = currp + cpitch * (begin - 1);
-        const uint8_t* curr_nxt = curr_pre + 2 * cpitch;
-        const uint8_t* prev_pre = prevp + ppitch * (begin - 1);
-        const uint8_t* prev_nxt = prev_pre + 2 * ppitch;
-        const uint8_t* next_pre = nextp + npitch * (begin - 1);
-        const uint8_t* next_nxt = next_pre + 2 * npitch;
-
-        const uint8_t *fm_prev_top, *fm_prev_mdl, *fm_prev_btm,
-                      *fm_next_top, *fm_next_mdl, *fm_next_btm;
+        const uint8_t *fm_prev, *fm_next;
         int fm_ppitch, fm_npitch;
-        if (fieldt != order) {
+        if (ft != order) {
             fm_ppitch = cpitch * 2;
             fm_npitch = npitch * 2;
-            fm_prev_mdl = currp + begin * cpitch;
-            fm_next_mdl = nextp + begin * npitch;
+            fm_prev = currp + begin * cpitch;
+            fm_next = nextp + begin * npitch;
         } else {
             fm_ppitch = ppitch * 2;
             fm_npitch = cpitch * 2;
-            fm_prev_mdl = prevp + begin * ppitch;
-            fm_next_mdl = currp + begin * cpitch;
+            fm_prev = prevp + begin * ppitch;
+            fm_next = currp + begin * cpitch;
         }
-        fm_prev_top = fm_prev_mdl - fm_ppitch;
-        fm_prev_btm = fm_prev_mdl + fm_ppitch;
-        fm_next_top = fm_next_mdl - fm_npitch;
-        fm_next_btm = fm_next_mdl + fm_npitch;
 
         const uint8_t* edeintp = edeint->GetReadPtr(plane);
         uint8_t* dstp = dst->GetWritePtr(plane);
@@ -121,7 +109,7 @@ PVideoFrame __stdcall YadifMod::GetFrame(int n, ise_t* env)
         const int epitch = edeint->GetPitch(plane);
         const int dpitch = dst->GetPitch(plane);
 
-        if (fieldt == 0) {
+        if (ft == 0) {
             memcpy(dstp, currp + cpitch, width);
             memcpy(dstp + dpitch * (height - 2),
                    edeintp + epitch * (height - 2), width);
@@ -130,15 +118,14 @@ PVideoFrame __stdcall YadifMod::GetFrame(int n, ise_t* env)
             memcpy(dstp + dpitch * (height - 1),
                    currp + cpitch * (height - 2), width);
         }
-        env->BitBlt(dstp + (1 - fieldt) * dpitch, 2 * dpitch,
-                    currp + (1 - fieldt) * cpitch, 2 * cpitch, width, height / 2);
+        env->BitBlt(dstp + (1 - ft) * dpitch, 2 * dpitch,
+                    currp + (1 - ft) * cpitch, 2 * cpitch, width, height / 2);
 
-        main_proc(curr_pre, curr_nxt, prev_pre, prev_nxt, next_pre, next_nxt,
-                  fm_prev_top, fm_prev_mdl, fm_prev_btm,
-                  fm_next_top, fm_next_mdl, fm_next_btm,
-                  edeintp + begin * epitch, dstp + begin * dpitch,
-                  width, height, 2 * cpitch, 2 * ppitch, 2 * npitch,
-                  fm_ppitch, fm_npitch, 2 * epitch, 2 * dpitch, begin, end);
+        mainProc(currp + begin * cpitch, prevp + begin * ppitch,
+                 nextp + begin * npitch, fm_prev, fm_next,
+                 edeintp + begin * epitch, dstp + begin * dpitch, width,
+                 cpitch, ppitch, npitch, fm_ppitch, fm_npitch, 2 * epitch,
+                 2 * dpitch, count);
     }
 
     return dst;

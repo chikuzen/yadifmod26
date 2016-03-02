@@ -16,7 +16,7 @@ INFO:
       Modified version of Fizick's avisynth filter port of yadif from mplayer.  This version
    doesn't internally generate spatial predictions, but takes them from an external clip.
    It also is not an Avisynth_C plugin (just a normal one).
-   This version works with All planar formats(Y8/YV12/YV411/YV16/YV24).
+   This version works with all planar formats(Y8/YV12/YV411/YV16/YV24).
 
 
    Syntax =>
@@ -98,7 +98,7 @@ NOTE:
 
 CHANGE LIST:
 
-   03/01/2016  yadifmod for avysynth2.6 v0.0.0
+   03/01/2016  yadifmod for avisynth2.6 v0.0.0
 
        - Initial Release by Chikuzen
 
